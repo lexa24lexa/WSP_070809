@@ -37,6 +37,13 @@ public class ProductController {
     return "edit";
   }
 
+  @PostMapping("/update/{id}")
+  public String updateProduct(@PathVariable Long id, @ModelAttribute Product product) {
+    productService.updateProduct(id, product);
+    return "redirect:/products";
+  }
+
+
   // d id
   @GetMapping("/delete/{id}")
   public String deleteProduct(@PathVariable Long id) {
@@ -53,7 +60,6 @@ public class ProductController {
 
   @PostMapping("/save")
   public String saveProduct(@ModelAttribute Product product) {
-    System.out.println("🚀 POST /products/save CHAMADO");
     productService.addProduct(product);
     return "redirect:/products";
   }
