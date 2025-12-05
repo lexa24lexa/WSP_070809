@@ -5,7 +5,11 @@
 </head>
 <body>
 <h1>Products</h1>
-<a th:href="@{/products/new}">Add New Product</a>
+
+<a th:href="@{/products/new}" style="margin-bottom: 20px; display: inline-block;">
+    Add New Product
+</a>
+
 <table border="1" cellpadding="5" cellspacing="0">
     <thead>
     <tr>
@@ -13,7 +17,7 @@
         <th>Name</th>
         <th>Category</th>
         <th>Price</th>
-        <th>Actions</th> <!-- última coluna com os botões -->
+        <th>Actions</th>
     </tr>
     </thead>
     <tbody>
