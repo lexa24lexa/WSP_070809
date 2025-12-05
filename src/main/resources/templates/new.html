@@ -1,9 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
   <title>Add New Product</title>
 </head>
 <body>
+<nav>
+  <a th:href="@{/products}">Products Table</a>
+  <a th:href="@{/products/new}">Add Product</a>
+  <a th:href="@{/about}">About Author</a>
+</nav>
+
 <h1>Add New Product</h1>
 <form th:action="@{/products/save}" th:object="${product}" method="post">
   <p>Name: <input type="text" th:field="*{name}" /></p>

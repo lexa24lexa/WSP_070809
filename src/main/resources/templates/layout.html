@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">Lab07 - Spring 07</title>
+</head>
+<body>
+<nav>
+  <a th:href="@{/products}">Products Table</a>
+  <a th:href="@{/products/new}">Add Product</a>
+  <a th:href="@{/about}">About Author</a>
+</nav>
+
+<div th:fragment="content"></div>
+
+<footer>
+  <p>&copy; 2025 Alexandra Smirnova</p>
+</footer>
+</body>
+</html>

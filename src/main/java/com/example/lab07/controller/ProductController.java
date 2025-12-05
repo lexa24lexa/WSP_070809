@@ -16,52 +16,56 @@ public class ProductController {
     this.productService = productService;
   }
 
-  // r all products
+  // r add
   @GetMapping
   public String listProducts(Model model) {
     model.addAttribute("products", productService.getAllProducts());
-    return "list";
+    model.addAttribute("pageTitle", "Product List");
+    return "list"; // render list.html
   }
 
-  // r details
+  // r id
   @GetMapping("/{id}")
   public String showDetails(@PathVariable Long id, Model model) {
     productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-    return "details";
-  }
-
-  // u
-  @GetMapping("/edit/{id}")
-  public String editProductForm(@PathVariable Long id, Model model) {
-    productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-    return "edit";
-  }
-
-  @PostMapping("/update/{id}")
-  public String updateProduct(@PathVariable Long id, @ModelAttribute Product product) {
-    productService.updateProduct(id, product);
-    return "redirect:/products";
-  }
-
-
-  // d id
-  @GetMapping("/delete/{id}")
-  public String deleteProduct(@PathVariable Long id) {
-    productService.deleteProduct(id);
-    return "redirect:/products";
+    model.addAttribute("pageTitle", "Product Details");
+    return "details"; // render details.html
   }
 
   // c
   @GetMapping("/new")
   public String newProductForm(Model model) {
     model.addAttribute("product", new Product());
-    return "new";
+    model.addAttribute("pageTitle", "Add New Product");
+    return "new"; // render new.html
   }
 
+  // c save
   @PostMapping("/save")
   public String saveProduct(@ModelAttribute Product product) {
     productService.addProduct(product);
     return "redirect:/products";
   }
 
+  // u
+  @GetMapping("/edit/{id}")
+  public String editProductForm(@PathVariable Long id, Model model) {
+    productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
+    model.addAttribute("pageTitle", "Edit Product");
+    return "edit"; // render edit.html
+  }
+
+  // u save
+  @PostMapping("/update/{id}")
+  public String updateProduct(@PathVariable Long id, @ModelAttribute Product product) {
+    productService.updateProduct(id, product);
+    return "redirect:/products";
+  }
+
+  // d
+  @GetMapping("/delete/{id}")
+  public String deleteProduct(@PathVariable Long id) {
+    productService.deleteProduct(id);
+    return "redirect:/products";
+  }
 }
