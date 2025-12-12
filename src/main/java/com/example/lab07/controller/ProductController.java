@@ -2,8 +2,10 @@ package com.example.lab07.controller;
 
 import com.example.lab07.model.Product;
 import com.example.lab07.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -16,12 +18,12 @@ public class ProductController {
     this.productService = productService;
   }
 
-  // r add
+  // r all
   @GetMapping
   public String listProducts(Model model) {
     model.addAttribute("products", productService.getAllProducts());
     model.addAttribute("pageTitle", "Product List");
-    return "list"; // render list.html
+    return "list";
   }
 
   // r id
@@ -29,7 +31,7 @@ public class ProductController {
   public String showDetails(@PathVariable Long id, Model model) {
     productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
     model.addAttribute("pageTitle", "Product Details");
-    return "details"; // render details.html
+    return "details";
   }
 
   // c
@@ -37,12 +39,19 @@ public class ProductController {
   public String newProductForm(Model model) {
     model.addAttribute("product", new Product());
     model.addAttribute("pageTitle", "Add New Product");
-    return "new"; // render new.html
+    return "new";
   }
 
   // c save
   @PostMapping("/save")
-  public String saveProduct(@ModelAttribute Product product) {
+  public String saveProduct(@Valid @ModelAttribute("product") Product product,
+                            BindingResult result,
+                            Model model) {
+    if (result.hasErrors()) {
+      model.addAttribute("pageTitle", "Add New Product");
+      return "new";
+    }
+
     productService.addProduct(product);
     return "redirect:/products";
   }
@@ -52,12 +61,20 @@ public class ProductController {
   public String editProductForm(@PathVariable Long id, Model model) {
     productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
     model.addAttribute("pageTitle", "Edit Product");
-    return "edit"; // render edit.html
+    return "edit";
   }
 
   // u save
   @PostMapping("/update/{id}")
-  public String updateProduct(@PathVariable Long id, @ModelAttribute Product product) {
+  public String updateProduct(@PathVariable Long id,
+                              @Valid @ModelAttribute("product") Product product,
+                              BindingResult result,
+                              Model model) {
+    if (result.hasErrors()) {
+      model.addAttribute("pageTitle", "Edit Product");
+      return "edit";
+    }
+
     productService.updateProduct(id, product);
     return "redirect:/products";
   }

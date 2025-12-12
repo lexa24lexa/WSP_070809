@@ -12,7 +12,7 @@
 </nav>
 
 <h1>Products</h1>
-<a th:href="@{/products/new}" class="add-product">Add New Product</a>
+<button><a th:href="@{/products/new}" class="add-product">Add New Product</a></button>
 
 <table border="1" cellpadding="5" cellspacing="0">
   <thead>
@@ -31,11 +31,11 @@
     <td th:text="${product.category}"></td>
     <td th:text="${product.price}"></td>
     <td>
-      <a th:href="@{|/products/${product.id}|}" class="btn">Details</a>
-      <a th:href="@{|/products/edit/${product.id}|}" class="btn">Edit</a>
-      <a th:href="@{|/products/delete/${product.id}|}"
+      <button><a th:href="@{|/products/${product.id}|}" class="btn">Details</a></button>
+      <button><a th:href="@{|/products/edit/${product.id}|}" class="btn">Edit</a></button>
+      <button><a th:href="@{|/products/delete/${product.id}|}"
          th:onclick="return confirm('Are you sure?')"
-         class="btn btn-delete">Delete</a>
+         class="btn btn-delete">Delete</a></button>
     </td>
   </tr>
   </tbody>
