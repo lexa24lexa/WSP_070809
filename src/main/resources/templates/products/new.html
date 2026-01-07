@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Product</title>
+</head>
+<body>
+<h1>Add New Product</h1>
+
+<form id="newProductForm">
+  <p>
+    <label>Name:</label>
+    <input type="text" id="name" required>
+  </p>
+  <p>
+    <label>Category:</label>
+    <input type="text" id="category" required>
+  </p>
+  <p>
+    <label>Weight [kg]:</label>
+    <input type="number" id="weight" step="0.01" min="0" required>
+  </p>
+  <p>
+    <label>Price [pln]:</label>
+    <input type="number" id="price" step="0.01" min="0" required>
+  </p>
+  <button type="submit">Save</button>
+</form>
+
+<button onclick="backToList()">Back to List</button>
+
+<script>
+  const apiUrl = "/api/products";
+
+  document.getElementById("newProductForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const product = {
+      name: document.getElementById("name").value,
+      category: document.getElementById("category").value,
+      weight: parseFloat(document.getElementById("weight").value),
+      price: parseFloat(document.getElementById("price").value)
+    };
+
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(product)
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      alert("Erro ao criar produto:\n" + text);
+      return;
+    }
+
+    window.location.href = "/";
+  };
+
+  function backToList() {
+    window.location.href = "/";
+  }
+</script>
+
+</body>
+</html>

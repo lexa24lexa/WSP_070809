@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Details</title>
+</head>
+<body>
+
+<h1>Product Details</h1>
+
+<p><strong>ID:</strong> <span id="pId"></span></p>
+<p><strong>Name:</strong> <span id="pName"></span></p>
+<p><strong>Category:</strong> <span id="pCategory"></span></p>
+<p><strong>Weight [kg]:</strong> <span id="pWeight"></span></p>
+<p><strong>Price [pln]:</strong> <span id="pPrice"></span></p>
+
+<button onclick="backToList()">Back to List</button>
+
+<script>
+  const apiUrl = "/api/products";
+  const id = window.location.pathname.split("/").pop();
+
+  async function loadProduct() {
+    const res = await fetch(`${apiUrl}/${id}`);
+    if (!res.ok) {
+      alert("Product not found");
+      window.location.href = "/";
+      return;
+    }
+
+    const p = await res.json();
+    document.getElementById("pId").innerText = p.id;
+    document.getElementById("pName").innerText = p.name;
+    document.getElementById("pCategory").innerText = p.category;
+    document.getElementById("pWeight").innerText = p.weight;
+    document.getElementById("pPrice").innerText = p.price;
+  }
+
+  function backToList() {
+    window.location.href = "/";
+  }
+
+  loadProduct();
+</script>
+
+</body>
+</html>

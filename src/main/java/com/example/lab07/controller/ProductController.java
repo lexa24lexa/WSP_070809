@@ -3,13 +3,14 @@ package com.example.lab07.controller;
 import com.example.lab07.model.Product;
 import com.example.lab07.service.ProductService;
 import jakarta.validation.Valid;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/products")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/products")
 public class ProductController {
 
   private final ProductService productService;
@@ -20,69 +21,42 @@ public class ProductController {
 
   // r all
   @GetMapping
-  public String listProducts(Model model) {
-    model.addAttribute("products", productService.getAllProducts());
-    model.addAttribute("pageTitle", "Product List");
-    return "list";
+  public List<Product> getAllProducts() {
+    return productService.getAllProducts();
   }
 
-  // r id
+  // r by id
   @GetMapping("/{id}")
-  public String showDetails(@PathVariable Long id, Model model) {
-    productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-    model.addAttribute("pageTitle", "Product Details");
-    return "details";
+  public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    return productService.getProductById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
   }
 
   // c
-  @GetMapping("/new")
-  public String newProductForm(Model model) {
-    model.addAttribute("product", new Product());
-    model.addAttribute("pageTitle", "Add New Product");
-    return "new";
-  }
-
-  // c save
-  @PostMapping("/save")
-  public String saveProduct(@Valid @ModelAttribute("product") Product product,
-                            BindingResult result,
-                            Model model) {
-    if (result.hasErrors()) {
-      model.addAttribute("pageTitle", "Add New Product");
-      return "new";
-    }
-
-    productService.addProduct(product);
-    return "redirect:/products";
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public Product createProduct(@Valid @RequestBody Product product) {
+    return productService.addProduct(product);
   }
 
   // u
-  @GetMapping("/edit/{id}")
-  public String editProductForm(@PathVariable Long id, Model model) {
-    productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-    model.addAttribute("pageTitle", "Edit Product");
-    return "edit";
-  }
+  @PutMapping("/{id}")
+  public ResponseEntity<Product> updateProduct(
+          @PathVariable Long id,
+          @Valid @RequestBody Product product) {
 
-  // u save
-  @PostMapping("/update/{id}")
-  public String updateProduct(@PathVariable Long id,
-                              @Valid @ModelAttribute("product") Product product,
-                              BindingResult result,
-                              Model model) {
-    if (result.hasErrors()) {
-      model.addAttribute("pageTitle", "Edit Product");
-      return "edit";
-    }
-
-    productService.updateProduct(id, product);
-    return "redirect:/products";
+    return productService.updateProduct(id, product)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
   }
 
   // d
-  @GetMapping("/delete/{id}")
-  public String deleteProduct(@PathVariable Long id) {
-    productService.deleteProduct(id);
-    return "redirect:/products";
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    if (productService.deleteProduct(id)) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.notFound().build();
   }
 }

@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Product List</title>
+  <title>Products & Categories</title>
 </head>
 <body>
+
 <nav>
-  <a th:href="@{/products}">Products Table</a>
-  <a th:href="@{/products/new}">Add Product</a>
-  <a th:href="@{/about}">About Author</a>
+  <a href="/">Home</a>
+  <a href="/products/new">Add Product</a>
+  <a href="/about">About Author</a>
 </nav>
 
 <h1>Products</h1>
-<button><a th:href="@{/products/new}" class="add-product">Add New Product</a></button>
+<button id="addProductBtn">Add New Product</button>
 
 <table border="1" cellpadding="5" cellspacing="0">
   <thead>
@@ -20,25 +21,61 @@
     <th>ID</th>
     <th>Name</th>
     <th>Category</th>
+    <th>Weight</th>
     <th>Price</th>
     <th>Actions</th>
   </tr>
   </thead>
-  <tbody>
-  <tr th:each="product : ${products}">
-    <td th:text="${product.id}"></td>
-    <td th:text="${product.name}"></td>
-    <td th:text="${product.category}"></td>
-    <td th:text="${product.price}"></td>
-    <td>
-      <button><a th:href="@{|/products/${product.id}|}" class="btn">Details</a></button>
-      <button><a th:href="@{|/products/edit/${product.id}|}" class="btn">Edit</a></button>
-      <button><a th:href="@{|/products/delete/${product.id}|}"
-         th:onclick="return confirm('Are you sure?')"
-         class="btn btn-delete">Delete</a></button>
-    </td>
-  </tr>
-  </tbody>
+  <tbody id="productsTable"></tbody>
 </table>
+
+<script>
+  const apiUrl = "/api/products";
+
+  async function loadProducts() {
+    const res = await fetch(apiUrl);
+    const products = await res.json();
+    const tbody = document.getElementById("productsTable");
+    tbody.innerHTML = "";
+
+    products.forEach(p => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.name}</td>
+        <td>${p.category}</td>
+        <td>${p.weight}</td>
+        <td>${p.price}</td>
+        <td>
+          <button onclick="viewProduct(${p.id})">Details</button>
+          <button onclick="editProduct(${p.id})">Edit</button>
+          <button onclick="deleteProduct(${p.id})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm("Are you sure?")) return;
+    await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+    loadProducts();
+  }
+
+  function viewProduct(id) {
+    window.location.href = `/products/${id}`;
+  }
+
+  function editProduct(id) {
+    window.location.href = `/products/edit/${id}`;
+  }
+
+  document.getElementById("addProductBtn").onclick = () => {
+    window.location.href = "/products/new";
+  };
+
+  loadProducts();
+</script>
+
 </body>
 </html>

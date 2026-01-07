@@ -1,21 +1,33 @@
 package com.example.lab07.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PageController {
 
   @GetMapping("/")
-  public String index(Model model) {
-    model.addAttribute("pageTitle", "Home");
-    return "index";
+  public String landingPage() {
+    return "list";
   }
 
   @GetMapping("/about")
-  public String about(Model model) {
-    model.addAttribute("pageTitle", "About Author");
+  public String aboutPage() {
     return "about";
+  }
+
+  @GetMapping("/products/{id}")
+  public String detailsPage() {
+    return "products/details";
+  }
+
+  @GetMapping("/products/new")
+  public String newProductPage() {
+    return "products/new";
+  }
+
+  @GetMapping("/products/edit/{id}")
+  public String editProductPage() {
+    return "products/edit";
   }
 }
