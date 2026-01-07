@@ -20,16 +20,16 @@ public class Product {
   private Double price;
 
   @NotBlank(message = "Category is required")
-  private String category;
+  private String categoryCode;
 
   public Product() {}
 
-  public Product(Long id, String name, Double weight, Double price, String category) {
+  public Product(Long id, String name, Double weight, Double price, String categoryCode) {
     this.id = id;
     this.name = name;
     this.weight = weight;
     this.price = price;
-    this.category = category;
+    this.categoryCode = categoryCode;
   }
 
   public Long getId() { return id; }
@@ -44,6 +44,6 @@ public class Product {
   public Double getPrice() { return price; }
   public void setPrice(Double price) { this.price = price; }
 
-  public String getCategory() { return category; }
-  public void setCategory(String category) { this.category = category; }
+  public String getCategoryCode() { return categoryCode; }
+  public void setCategoryCode(String categoryCode) { this.categoryCode = categoryCode; }
 }

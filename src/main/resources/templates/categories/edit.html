@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Category</title>
+</head>
+<body>
+<h1>Edit Category</h1>
+
+<form id="editCategoryForm">
+  <p>
+    <label>Name:</label>
+    <input type="text" id="name" required>
+  </p>
+  <p>
+    <label>Code:</label>
+    <input type="text" id="code" required>
+  </p>
+  <button type="submit">Update</button>
+</form>
+
+<button onclick="backToList()">Back to List</button>
+
+<script>
+  const apiUrl = "/api/categories";
+  const id = window.location.pathname.split("/").pop();
+
+  async function loadCategory() {
+    const res = await fetch(`${apiUrl}/${id}`);
+    if (!res.ok) {
+      alert("Category not found");
+      window.location.href = "/";
+      return;
+    }
+    const c = await res.json();
+    document.getElementById("name").value = c.name;
+    document.getElementById("code").value = c.code;
+  }
+
+  document.getElementById("editCategoryForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const category = {
+      name: document.getElementById("name").value,
+      code: document.getElementById("code").value
+    };
+
+    await fetch(`${apiUrl}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category)
+    });
+
+    window.location.href = "/";
+  };
+
+  function backToList() {
+    window.location.href = "/";
+  }
+
+  loadCategory();
+</script>
+</body>
+</html>

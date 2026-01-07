@@ -9,6 +9,7 @@
 <nav>
   <a href="/">Home</a>
   <a href="/products/new">Add Product</a>
+  <a href="/categories/new">Add Category</a>
   <a href="/about">About Author</a>
 </nav>
 
@@ -29,11 +30,26 @@
   <tbody id="productsTable"></tbody>
 </table>
 
+<h1>Categories</h1>
+<button id="addCategoryBtn">Add New Category</button>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Code</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody id="categoriesTable"></tbody>
+</table>
+
 <script>
-  const apiUrl = "/api/products";
+  const productsApi = "/api/products";
 
   async function loadProducts() {
-    const res = await fetch(apiUrl);
+    const res = await fetch(productsApi);
     const products = await res.json();
     const tbody = document.getElementById("productsTable");
     tbody.innerHTML = "";
@@ -58,7 +74,7 @@
 
   async function deleteProduct(id) {
     if (!confirm("Are you sure?")) return;
-    await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+    await fetch(`${productsApi}/${id}`, { method: "DELETE" });
     loadProducts();
   }
 
@@ -74,7 +90,46 @@
     window.location.href = "/products/new";
   };
 
+  const categoriesApi = "/api/categories";
+
+  async function loadCategories() {
+    const res = await fetch(categoriesApi);
+    const categories = await res.json();
+    const tbody = document.getElementById("categoriesTable");
+    tbody.innerHTML = "";
+
+    categories.forEach(c => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${c.id}</td>
+        <td>${c.name}</td>
+        <td>${c.code}</td>
+        <td>
+          <button onclick="editCategory(${c.id})">Edit</button>
+          <button onclick="deleteCategory(${c.id})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function deleteCategory(id) {
+    if (!confirm("Are you sure? Deleting this category will also delete all products in it.")) return;
+    await fetch(`${categoriesApi}/${id}`, { method: "DELETE" });
+    loadCategories();
+    loadProducts();
+  }
+
+  function editCategory(id) {
+    window.location.href = `/categories/edit/${id}`;
+  }
+
+  document.getElementById("addCategoryBtn").onclick = () => {
+    window.location.href = "/categories/new";
+  };
+
   loadProducts();
+  loadCategories();
 </script>
 
 </body>

@@ -14,7 +14,7 @@
   </p>
   <p>
     <label>Category:</label>
-    <input type="text" id="category" required>
+    <select id="category" required></select>
   </p>
   <p>
     <label>Weight [kg]:</label>
@@ -31,16 +31,37 @@
 
 <script>
   const apiUrl = "/api/products";
+  const categoriesApi = "/api/categories";
+
+  async function loadCategories() {
+    const res = await fetch(categoriesApi);
+    const categories = await res.json();
+    const select = document.getElementById("category");
+    select.innerHTML = "";
+    categories.forEach(c => {
+      const option = document.createElement("option");
+      option.value = c.code;
+      option.text = c.name;
+      select.appendChild(option);
+    });
+  }
 
   document.getElementById("newProductForm").onsubmit = async (e) => {
     e.preventDefault();
 
     const product = {
       name: document.getElementById("name").value,
-      category: document.getElementById("category").value,
+      categoryCode: document.getElementById("category").value,
       weight: parseFloat(document.getElementById("weight").value),
       price: parseFloat(document.getElementById("price").value)
     };
+
+    const catRes = await fetch(categoriesApi);
+    const cats = await catRes.json();
+    if (!cats.find(c => c.code === product.categoryCode)) {
+      alert("Invalid category. Please select an existing category.");
+      return;
+    }
 
     const res = await fetch(apiUrl, {
       method: "POST",
@@ -50,7 +71,7 @@
 
     if (!res.ok) {
       const text = await res.text();
-      alert("Erro ao criar produto:\n" + text);
+      alert("Error creating product:\n" + text);
       return;
     }
 
@@ -60,7 +81,8 @@
   function backToList() {
     window.location.href = "/";
   }
-</script>
 
+  loadCategories();
+</script>
 </body>
 </html>

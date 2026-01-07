@@ -16,11 +16,6 @@ public class PageController {
     return "about";
   }
 
-  @GetMapping("/products/{id}")
-  public String detailsPage() {
-    return "products/details";
-  }
-
   @GetMapping("/products/new")
   public String newProductPage() {
     return "products/new";
@@ -29,5 +24,20 @@ public class PageController {
   @GetMapping("/products/edit/{id}")
   public String editProductPage() {
     return "products/edit";
+  }
+
+  @GetMapping("/products/{id}")
+  public String productDetailsPage() {
+    return "products/details";
+  }
+
+  @GetMapping("/categories/new")
+  public String newCategoryPage() {
+    return "categories/new";
+  }
+
+  @GetMapping("/categories/edit/{id}")
+  public String editCategoryPage() {
+    return "categories/edit";
   }
 }

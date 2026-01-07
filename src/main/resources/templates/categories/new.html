@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Category</title>
+</head>
+<body>
+<h1>Add New Category</h1>
+
+<form id="newCategoryForm">
+  <p>
+    <label>Name:</label>
+    <input type="text" id="name" required>
+  </p>
+  <p>
+    <label>Code:</label>
+    <input type="text" id="code" required>
+  </p>
+  <button type="submit">Save</button>
+</form>
+
+<button onclick="backToList()">Back to List</button>
+
+<script>
+  const apiUrl = "/api/categories";
+
+  document.getElementById("newCategoryForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const category = {
+      name: document.getElementById("name").value,
+      code: document.getElementById("code").value
+    };
+
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category)
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      alert("Erro ao criar categoria:\n" + text);
+      return;
+    }
+
+    window.location.href = "/";
+  };
+
+  function backToList() {
+    window.location.href = "/";
+  }
+</script>
+</body>
+</html>

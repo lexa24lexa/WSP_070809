@@ -14,7 +14,7 @@
   </p>
   <p>
     <label>Category:</label>
-    <input type="text" id="category" required>
+    <select id="category" required></select>
   </p>
   <p>
     <label>Weight [kg]:</label>
@@ -31,35 +31,62 @@
 
 <script>
   const apiUrl = "/api/products";
+  const categoriesApi = "/api/categories";
   const id = window.location.pathname.split("/").pop();
 
   async function loadProduct() {
     const res = await fetch(`${apiUrl}/${id}`);
     if (!res.ok) {
-      alert("Product not found");
+      alert("Product not found.");
       window.location.href = "/";
       return;
     }
     const p = await res.json();
+
     document.getElementById("name").value = p.name;
-    document.getElementById("category").value = p.category;
     document.getElementById("weight").value = p.weight;
     document.getElementById("price").value = p.price;
+
+    await loadCategories();
+    document.getElementById("category").value = p.categoryCode;
+  }
+
+  async function loadCategories() {
+    const res = await fetch(categoriesApi);
+    const categories = await res.json();
+    const select = document.getElementById("category");
+    select.innerHTML = "";
+    categories.forEach(c => {
+      const option = document.createElement("option");
+      option.value = c.code;
+      option.text = c.name;
+      select.appendChild(option);
+    });
   }
 
   document.getElementById("editProductForm").onsubmit = async (e) => {
     e.preventDefault();
+
     const product = {
       name: document.getElementById("name").value,
-      category: document.getElementById("category").value,
+      categoryCode: document.getElementById("category").value,
       weight: parseFloat(document.getElementById("weight").value),
       price: parseFloat(document.getElementById("price").value)
     };
+
+    const catRes = await fetch(categoriesApi);
+    const cats = await catRes.json();
+    if (!cats.find(c => c.code === product.categoryCode)) {
+      alert("Invalid category. Please select an existing category.");
+      return;
+    }
+
     await fetch(`${apiUrl}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(product)
     });
+
     window.location.href = "/";
   };
 
