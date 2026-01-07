@@ -17,8 +17,8 @@ public class ProductSeeder implements CommandLineRunner {
   @Override
   public void run(String... args) {
     if (productService.getAllProducts().isEmpty()) {
-      productService.addProduct(new Product(null, "Bread", 1.0, 5.20, "Baking"));
-      productService.addProduct(new Product(null, "Butter", 0.25, 7.00, "Dairy"));
+      productService.addProduct(new Product(null, "Bread", 1.0, 5.20, 1, "Baking"));
+      productService.addProduct(new Product(null, "Butter", 0.25, 7.00, 2, "Dairy"));
     }
   }
 }

@@ -8,22 +8,11 @@
 <h1>Add New Product</h1>
 
 <form id="newProductForm">
-  <p>
-    <label>Name:</label>
-    <input type="text" id="name" required>
-  </p>
-  <p>
-    <label>Category:</label>
-    <select id="category" required></select>
-  </p>
-  <p>
-    <label>Weight [kg]:</label>
-    <input type="number" id="weight" step="0.01" min="0" required>
-  </p>
-  <p>
-    <label>Price [pln]:</label>
-    <input type="number" id="price" step="0.01" min="0" required>
-  </p>
+  <p><label>Name:</label><input type="text" id="name" required></p>
+  <p><label>Category:</label><select id="category" required></select></p>
+  <p><label>Product Index:</label><input type="number" id="productIndex" step="1" min="1" required></p>
+  <p><label>Weight [kg]:</label><input type="number" id="weight" step="0.01" min="0" required></p>
+  <p><label>Price [pln]:</label><input type="number" id="price" step="0.01" min="0" required></p>
   <button type="submit">Save</button>
 </form>
 
@@ -52,12 +41,13 @@
     const product = {
       name: document.getElementById("name").value,
       categoryCode: document.getElementById("category").value,
+      productIndex: parseInt(document.getElementById("productIndex").value),
       weight: parseFloat(document.getElementById("weight").value),
       price: parseFloat(document.getElementById("price").value)
     };
 
-    const catRes = await fetch(categoriesApi);
-    const cats = await catRes.json();
+    const catsRes = await fetch(categoriesApi);
+    const cats = await catsRes.json();
     if (!cats.find(c => c.code === product.categoryCode)) {
       alert("Invalid category. Please select an existing category.");
       return;
@@ -70,8 +60,7 @@
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      alert("Error creating product:\n" + text);
+      alert("Error creating product.");
       return;
     }
 

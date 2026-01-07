@@ -8,14 +8,8 @@
 <h1>Add New Category</h1>
 
 <form id="newCategoryForm">
-  <p>
-    <label>Name:</label>
-    <input type="text" id="name" required>
-  </p>
-  <p>
-    <label>Code:</label>
-    <input type="text" id="code" required>
-  </p>
+  <p><label>Name:</label><input type="text" id="name" required></p>
+  <p><label>Code:</label><input type="text" id="code" required></p>
   <button type="submit">Save</button>
 </form>
 
@@ -26,7 +20,6 @@
 
   document.getElementById("newCategoryForm").onsubmit = async (e) => {
     e.preventDefault();
-
     const category = {
       name: document.getElementById("name").value,
       code: document.getElementById("code").value
@@ -39,8 +32,7 @@
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      alert("Erro ao criar categoria:\n" + text);
+      alert("Error creating category.");
       return;
     }
 

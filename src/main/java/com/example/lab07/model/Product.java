@@ -19,16 +19,20 @@ public class Product {
   @Positive(message = "Price must be positive")
   private Double price;
 
+  @NotNull(message = "Product index is required")
+  private Integer productIndex;
+
   @NotBlank(message = "Category is required")
   private String categoryCode;
 
   public Product() {}
 
-  public Product(Long id, String name, Double weight, Double price, String categoryCode) {
+  public Product(Long id, String name, Double weight, Double price, Integer productIndex, String categoryCode) {
     this.id = id;
     this.name = name;
     this.weight = weight;
     this.price = price;
+    this.productIndex = productIndex;
     this.categoryCode = categoryCode;
   }
 
@@ -43,6 +47,9 @@ public class Product {
 
   public Double getPrice() { return price; }
   public void setPrice(Double price) { this.price = price; }
+
+  public Integer getProductIndex() { return productIndex; }
+  public void setProductIndex(Integer productIndex) { this.productIndex = productIndex; }
 
   public String getCategoryCode() { return categoryCode; }
   public void setCategoryCode(String categoryCode) { this.categoryCode = categoryCode; }

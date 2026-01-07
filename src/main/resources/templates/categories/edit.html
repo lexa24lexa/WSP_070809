@@ -8,14 +8,8 @@
 <h1>Edit Category</h1>
 
 <form id="editCategoryForm">
-  <p>
-    <label>Name:</label>
-    <input type="text" id="name" required>
-  </p>
-  <p>
-    <label>Code:</label>
-    <input type="text" id="code" required>
-  </p>
+  <p><label>Name:</label><input type="text" id="name" required></p>
+  <p><label>Code:</label><input type="text" id="code" required></p>
   <button type="submit">Update</button>
 </form>
 
@@ -27,11 +21,7 @@
 
   async function loadCategory() {
     const res = await fetch(`${apiUrl}/${id}`);
-    if (!res.ok) {
-      alert("Category not found");
-      window.location.href = "/";
-      return;
-    }
+    if (!res.ok) { alert("Category not found"); window.location.href = "/"; return; }
     const c = await res.json();
     document.getElementById("name").value = c.name;
     document.getElementById("code").value = c.code;
@@ -39,7 +29,6 @@
 
   document.getElementById("editCategoryForm").onsubmit = async (e) => {
     e.preventDefault();
-
     const category = {
       name: document.getElementById("name").value,
       code: document.getElementById("code").value
@@ -54,9 +43,7 @@
     window.location.href = "/";
   };
 
-  function backToList() {
-    window.location.href = "/";
-  }
+  function backToList() { window.location.href = "/"; }
 
   loadCategory();
 </script>

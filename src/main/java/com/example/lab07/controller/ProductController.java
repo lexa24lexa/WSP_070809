@@ -19,13 +19,11 @@ public class ProductController {
     this.productService = productService;
   }
 
-  // r all
   @GetMapping
   public List<Product> getAllProducts() {
     return productService.getAllProducts();
   }
 
-  // r by id
   @GetMapping("/{id}")
   public ResponseEntity<Product> getProductById(@PathVariable Long id) {
     return productService.getProductById(id)
@@ -33,25 +31,21 @@ public class ProductController {
             .orElse(ResponseEntity.notFound().build());
   }
 
-  // c
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Product createProduct(@Valid @RequestBody Product product) {
     return productService.addProduct(product);
   }
 
-  // u
   @PutMapping("/{id}")
   public ResponseEntity<Product> updateProduct(
           @PathVariable Long id,
           @Valid @RequestBody Product product) {
-
     return productService.updateProduct(id, product)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
   }
 
-  // d
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
     if (productService.deleteProduct(id)) {

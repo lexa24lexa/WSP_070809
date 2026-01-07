@@ -1,7 +1,6 @@
 package com.example.lab07.model;
 
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.ArrayList;
 import java.util.List;
 

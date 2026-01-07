@@ -45,6 +45,7 @@ public class CategoryService {
   public boolean deleteCategory(Long id) {
     Category cat = categoryMap.remove(id);
     if (cat != null) {
+      // Remove all products in this category
       for (Long pid : cat.getProductIds()) {
         productService.deleteProduct(pid);
       }

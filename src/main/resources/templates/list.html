@@ -47,6 +47,7 @@
 
 <script>
   const productsApi = "/api/products";
+  const categoriesApi = "/api/categories";
 
   async function loadProducts() {
     const res = await fetch(productsApi);
@@ -57,17 +58,16 @@
     products.forEach(p => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${p.id}</td>
-        <td>${p.name}</td>
-        <td>${p.category}</td>
-        <td>${p.weight}</td>
-        <td>${p.price}</td>
-        <td>
-          <button onclick="viewProduct(${p.id})">Details</button>
-          <button onclick="editProduct(${p.id})">Edit</button>
-          <button onclick="deleteProduct(${p.id})">Delete</button>
-        </td>
-      `;
+      <td>${p.id}</td>
+      <td>${p.name}</td>
+      <td>${p.categoryCode}</td>
+      <td>${p.weight}</td>
+      <td>${p.price}</td>
+      <td>
+        <button onclick="editProduct(${p.id})">Edit</button>
+        <button onclick="deleteProduct(${p.id})">Delete</button>
+      </td>
+    `;
       tbody.appendChild(tr);
     });
   }
@@ -78,19 +78,8 @@
     loadProducts();
   }
 
-  function viewProduct(id) {
-    window.location.href = `/products/${id}`;
-  }
-
-  function editProduct(id) {
-    window.location.href = `/products/edit/${id}`;
-  }
-
-  document.getElementById("addProductBtn").onclick = () => {
-    window.location.href = "/products/new";
-  };
-
-  const categoriesApi = "/api/categories";
+  function editProduct(id) { window.location.href = `/products/edit/${id}`; }
+  document.getElementById("addProductBtn").onclick = () => window.location.href = "/products/new";
 
   async function loadCategories() {
     const res = await fetch(categoriesApi);
@@ -101,14 +90,14 @@
     categories.forEach(c => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${c.id}</td>
-        <td>${c.name}</td>
-        <td>${c.code}</td>
-        <td>
-          <button onclick="editCategory(${c.id})">Edit</button>
-          <button onclick="deleteCategory(${c.id})">Delete</button>
-        </td>
-      `;
+      <td>${c.id}</td>
+      <td>${c.name}</td>
+      <td>${c.code}</td>
+      <td>
+        <button onclick="editCategory(${c.id})">Edit</button>
+        <button onclick="deleteCategory(${c.id})">Delete</button>
+      </td>
+    `;
       tbody.appendChild(tr);
     });
   }
@@ -120,13 +109,8 @@
     loadProducts();
   }
 
-  function editCategory(id) {
-    window.location.href = `/categories/edit/${id}`;
-  }
-
-  document.getElementById("addCategoryBtn").onclick = () => {
-    window.location.href = "/categories/new";
-  };
+  function editCategory(id) { window.location.href = `/categories/edit/${id}`; }
+  document.getElementById("addCategoryBtn").onclick = () => window.location.href = "/categories/new";
 
   loadProducts();
   loadCategories();

@@ -17,9 +17,8 @@ public class CategorySeeder implements CommandLineRunner {
   @Override
   public void run(String... args) {
     if (categoryService.getAllCategories().isEmpty()) {
-      categoryService.addCategory(new Category(null, "Electronics", "ELEC"));
-      categoryService.addCategory(new Category(null, "Books", "BOOK"));
-      categoryService.addCategory(new Category(null, "Food", "FOOD"));
+      categoryService.addCategory(new Category(null, "Baking", "Baking"));
+      categoryService.addCategory(new Category(null, "Dairy", "Dairy"));
     }
   }
 }
