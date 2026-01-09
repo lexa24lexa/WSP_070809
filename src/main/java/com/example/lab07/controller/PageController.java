@@ -16,6 +16,16 @@ public class PageController {
     return "about";
   }
 
+  @GetMapping("/login")
+  public String loginPage() {
+    return "login";
+  }
+
+  @GetMapping("/products")
+  public String productsPage() {
+    return "list";
+  }
+
   @GetMapping("/products/new")
   public String newProductPage() {
     return "products/new";

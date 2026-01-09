@@ -5,6 +5,29 @@
   <title>Product Details</title>
 </head>
 <body>
+<nav>
+  <a href="/">Home</a>
+
+  <!-- admin only -->
+  <a href="/products/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Product</a>
+  <a href="/categories/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Category</a>
+
+  <a href="/about">About Author</a>
+
+  <!-- guest -->
+  <a href="/login" th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">Login</a>
+
+  <!-- user -->
+  <span th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}">
+    <span th:text="${#authentication.principal.username}"></span>
+    <a href="/logout">Logout</a>
+  </span>
+
+  <!-- cart for user -->
+  <span th:if="${#authorization.expression('hasRole(''USER'')')}" style="float:right; margin-left: 20px;">
+    <a href="/cart">Cart (<span id="cartCount">0</span> items) - $<span id="cartTotal">0.00</span></a>
+  </span>
+</nav>
 
 <h1>Product Details</h1>
 

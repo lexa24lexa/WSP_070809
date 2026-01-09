@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title th:text="${pageTitle}">Lab07 - Spring 07</title>
+  <title>Login</title>
 </head>
 <body>
 <nav>
@@ -28,11 +27,19 @@
     <a href="/cart">Cart (<span id="cartCount">0</span> items) - $<span id="cartTotal">0.00</span></a>
   </span>
 </nav>
-
-<div th:fragment="content"></div>
-
-<footer>
-  <p>&copy; 2026 Alexandra Smirnova</p>
-</footer>
+<h2>Login</h2>
+<form th:action="@{/login}" method="post">
+  <div>
+    <label>Username:</label>
+    <input type="text" name="username" required>
+  </div>
+  <div>
+    <label>Password:</label>
+    <input type="password" name="password" required>
+  </div>
+  <button type="submit">Login</button>
+</form>
+<div th:if="${param.error}" style="color:red">Invalid username or password</div>
+<div th:if="${param.logout}" style="color:green">Logged out successfully</div>
 </body>
 </html>

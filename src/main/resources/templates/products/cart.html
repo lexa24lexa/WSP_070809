@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopping Cart</title>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+
+  <!-- admin only -->
+  <a href="/products/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Product</a>
+  <a href="/categories/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Category</a>
+
+  <a href="/about">About Author</a>
+
+  <!-- guest -->
+  <a href="/login" th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">Login</a>
+
+  <!-- logged-in user -->
+  <span th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}">
+    <span th:text="${#authentication.principal.username}"></span>
+    <a href="/logout">Logout</a>
+  </span>
+
+  <!-- cart mini info for ROLE_USER -->
+  <span th:if="${#authorization.expression('hasRole(''USER'')')}" style="float:right; margin-left: 20px;">
+    <a href="/cart">Cart (<span id="cartCount">0</span> items) - $<span id="cartTotal">0.00</span></a>
+  </span>
+</nav>
+
+<h1>Your Shopping Cart</h1>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+  <tr>
+    <th>Product</th>
+    <th>Price</th>
+    <th>Quantity</th>
+    <th>Subtotal</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="entry : ${cartItems}">
+    <td th:text="${entry.key.name}"></td>
+    <td th:text="${entry.key.price}"></td>
+    <td>
+      <form th:action="@{/cart/update/{id}(id=${entry.key.id})}" method="post">
+        <input type="number" name="quantity" th:value="${entry.value}" min="1">
+        <button type="submit">Update</button>
+      </form>
+    </td>
+    <td th:text="${#numbers.formatDecimal(entry.key.price * entry.value, 1, 'POINT', 2, 'NONE')}"></td>
+    <td>
+      <form th:action="@{/cart/remove/{id}(id=${entry.key.id})}" method="post">
+        <button type="submit">Remove</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h2>Total: <span id="total" th:text="${total}"></span></h2>
+
+<a href="/products">Continue Shopping</a>
+
+<script>
+  // Recalculate total when quantity changes
+  function recalcTotal() {
+    const rows = document.querySelectorAll("tbody tr");
+    let total = 0;
+    rows.forEach(row => {
+      const price = parseFloat(row.cells[1].textContent);
+      const qty = parseInt(row.cells[2].querySelector("input").value);
+      total += price * qty;
+    });
+    document.getElementById("total").textContent = total.toFixed(2);
+  }
+
+  // Update total on quantity change
+  document.querySelectorAll("input[name='quantity']").forEach(input => {
+    input.addEventListener("change", recalcTotal);
+  });
+
+  recalcTotal();
+
+  // Functions to update mini-cart in navbar
+  function getCartFromCookies() {
+    const cookies = document.cookie.split(';');
+    const cart = {};
+    cookies.forEach(c => {
+      const [name, value] = c.trim().split('=');
+      if (name.startsWith("prod")) {
+        cart[name.substring(4)] = parseInt(value);
+      }
+    });
+    return cart;
+  }
+
+  function updateMiniCart() {
+    const cart = getCartFromCookies();
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    fetch("/api/products")
+            .then(res => res.json())
+            .then(products => {
+              Object.entries(cart).forEach(([id, qty]) => {
+                const prod = products.find(p => p.id == id);
+                if (prod) totalPrice += prod.price * qty;
+                totalItems += qty;
+              });
+
+              const countElem = document.getElementById("cartCount");
+              const totalElem = document.getElementById("cartTotal");
+              if (countElem) countElem.textContent = totalItems;
+              if (totalElem) totalElem.textContent = totalPrice.toFixed(2);
+            });
+  }
+
+  updateMiniCart();
+</script>
+</body>
+</html>

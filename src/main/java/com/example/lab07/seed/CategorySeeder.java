@@ -3,9 +3,11 @@ package com.example.lab07.seed;
 import com.example.lab07.model.Category;
 import com.example.lab07.service.CategoryService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(1)
 public class CategorySeeder implements CommandLineRunner {
 
   private final CategoryService categoryService;

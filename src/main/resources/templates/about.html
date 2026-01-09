@@ -1,13 +1,35 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: content}">
+<html lang="en">
 <body>
+<nav>
+  <a href="/">Home</a>
 
+  <!-- admin only -->
+  <a href="/products/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Product</a>
+  <a href="/categories/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Category</a>
+
+  <a href="/about">About Author</a>
+
+  <!-- guest -->
+  <a href="/login" th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">Login</a>
+
+  <!-- user -->
+  <span th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}">
+    <span th:text="${#authentication.principal.username}"></span>
+    <a href="/logout">Logout</a>
+  </span>
+
+  <!-- cart for user -->
+  <span th:if="${#authorization.expression('hasRole(''USER'')')}" style="float:right; margin-left: 20px;">
+    <a href="/cart">Cart (<span id="cartCount">0</span> items) - $<span id="cartTotal">0.00</span></a>
+  </span>
+</nav>
 <h1>About the Author</h1>
 <p>Alexandra Smirnova</p>
 <p>Student ID: 293835</p>
 <p>Course: Web Systems Programming L</p>
 <p>This is a Spring + Thymeleaf + REST CRUD project.</p>
-<a href="/">Back to Products</a>
+<button onclick="location.href='/'">Back to Products</button>
 
 </body>
 </html>

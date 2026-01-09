@@ -1,21 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Products & Categories</title>
 </head>
 <body>
-
 <nav>
   <a href="/">Home</a>
-  <a href="/products/new">Add Product</a>
-  <a href="/categories/new">Add Category</a>
+
+  <!-- admin only -->
+  <a href="/products/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Product</a>
+  <a href="/categories/new" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Add Category</a>
+
   <a href="/about">About Author</a>
+
+  <!-- guest -->
+  <a href="/login" th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">Login</a>
+
+  <!-- user -->
+  <span th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}">
+    <span th:text="${#authentication.principal.username}"></span>
+    <a href="/logout">Logout</a>
+  </span>
+
+  <!-- cart for user -->
+  <span th:if="${#authorization.expression('hasRole(''USER'')')}" style="float:right; margin-left: 20px;">
+    <a href="/cart">Cart (<span id="cartCount">0</span> items) - $<span id="cartTotal">0.00</span></a>
+  </span>
 </nav>
 
 <h1>Products</h1>
-<button id="addProductBtn">Add New Product</button>
-
 <table border="1" cellpadding="5" cellspacing="0">
   <thead>
   <tr>
@@ -30,20 +44,35 @@
   <tbody id="productsTable"></tbody>
 </table>
 
-<h1>Categories</h1>
-<button id="addCategoryBtn">Add New Category</button>
+<div id="categoriesWrapper" style="display:none;">
+  <h1>Categories</h1>
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Code</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="categoriesTable"></tbody>
+  </table>
+</div>
 
-<table border="1" cellpadding="5" cellspacing="0">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Code</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody id="categoriesTable"></tbody>
-</table>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  var currentUserRole = 'GUEST';
+
+  var isAdmin = /*[[${#authorization.expression('hasRole(''ADMIN'')')}]]*/ false;
+  var isUser = /*[[${#authorization.expression('hasRole(''USER'')')}]]*/ false;
+
+  if (isAdmin) {
+    currentUserRole = 'ROLE_ADMIN';
+  } else if (isUser) {
+    currentUserRole = 'ROLE_USER';
+  }
+  /*]]>*/
+</script>
 
 <script>
   const productsApi = "/api/products";
@@ -57,31 +86,28 @@
 
     products.forEach(p => {
       const tr = document.createElement("tr");
+      let actions = '';
+
+      if (currentUserRole === 'ROLE_USER') actions += `<button onclick="addToCart(${p.id})">Add to Cart</button> `;
+      if (currentUserRole === 'ROLE_ADMIN') actions += `<button onclick="editProduct(${p.id})">Edit</button> <button onclick="deleteProduct(${p.id})">Delete</button> `;
+      actions += `<button onclick="viewDetails(${p.id})">Details</button>`;
+
       tr.innerHTML = `
       <td>${p.id}</td>
       <td>${p.name}</td>
       <td>${p.categoryCode}</td>
       <td>${p.weight}</td>
       <td>${p.price}</td>
-      <td>
-        <button onclick="editProduct(${p.id})">Edit</button>
-        <button onclick="deleteProduct(${p.id})">Delete</button>
-      </td>
+      <td>${actions}</td>
     `;
       tbody.appendChild(tr);
     });
   }
 
-  async function deleteProduct(id) {
-    if (!confirm("Are you sure?")) return;
-    await fetch(`${productsApi}/${id}`, { method: "DELETE" });
-    loadProducts();
-  }
-
-  function editProduct(id) { window.location.href = `/products/edit/${id}`; }
-  document.getElementById("addProductBtn").onclick = () => window.location.href = "/products/new";
-
   async function loadCategories() {
+    if (currentUserRole !== 'ROLE_ADMIN') return;
+
+    document.getElementById("categoriesWrapper").style.display = "block";
     const res = await fetch(categoriesApi);
     const categories = await res.json();
     const tbody = document.getElementById("categoriesTable");
@@ -89,31 +115,64 @@
 
     categories.forEach(c => {
       const tr = document.createElement("tr");
+      let actions = `<button onclick="editCategory(${c.id})">Edit</button> <button onclick="deleteCategory(${c.id})">Delete</button>`;
       tr.innerHTML = `
       <td>${c.id}</td>
       <td>${c.name}</td>
       <td>${c.code}</td>
-      <td>
-        <button onclick="editCategory(${c.id})">Edit</button>
-        <button onclick="deleteCategory(${c.id})">Delete</button>
-      </td>
+      <td>${actions}</td>
     `;
       tbody.appendChild(tr);
     });
   }
 
-  async function deleteCategory(id) {
-    if (!confirm("Are you sure? Deleting this category will also delete all products in it.")) return;
-    await fetch(`${categoriesApi}/${id}`, { method: "DELETE" });
-    loadCategories();
-    loadProducts();
+  async function addToCart(id) {
+    if (currentUserRole !== 'ROLE_USER') return;
+    await fetch(`/cart/add/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+    alert("Product added to cart!");
+    updateMiniCart();
   }
 
+  function getCartFromCookies() {
+    const cookies = document.cookie.split(';');
+    const cart = {};
+    cookies.forEach(c => {
+      const [name, value] = c.trim().split('=');
+      if (name.startsWith("prod")) {
+        cart[name.substring(4)] = parseInt(value);
+      }
+    });
+    return cart;
+  }
+
+  function updateMiniCart() {
+    if (currentUserRole !== 'ROLE_USER') return;
+    const cart = getCartFromCookies();
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    const productsPromise = fetch(productsApi).then(res => res.json());
+
+    productsPromise.then(products => {
+      Object.entries(cart).forEach(([id, qty]) => {
+        const prod = products.find(p => p.id == id);
+        if (prod) totalPrice += prod.price * qty;
+        totalItems += qty;
+      });
+      document.getElementById("cartCount").textContent = totalItems;
+      document.getElementById("cartTotal").textContent = totalPrice.toFixed(2);
+    });
+  }
+
+  async function deleteProduct(id) { if (!confirm("Are you sure?")) return; await fetch(`/api/products/${id}`, { method: "DELETE" }); loadProducts(); }
+  function editProduct(id) { window.location.href = `/products/edit/${id}`; }
+  function viewDetails(id) { window.location.href = `/products/${id}`; }
   function editCategory(id) { window.location.href = `/categories/edit/${id}`; }
-  document.getElementById("addCategoryBtn").onclick = () => window.location.href = "/categories/new";
+  async function deleteCategory(id) { if (!confirm("Are you sure? Deleting this category will also delete all products in it.")) return; await fetch(`/api/categories/${id}`, { method: "DELETE" }); loadCategories(); loadProducts(); }
 
   loadProducts();
   loadCategories();
+  updateMiniCart();
 </script>
 
 </body>
